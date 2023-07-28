@@ -17,24 +17,24 @@ RUN sudo apt-get update && \
 
 
 # Step 2: Install Chrome
-RUN apt-get update && apt-get install -y wget gnupg
-RUN wget -q -O - https://dl-ssl.google.com/linux/linux_signing_key.pub | apt-key add -
-RUN echo "deb [arch=amd64] http://dl.google.com/linux/chrome/deb/ stable main" >> /etc/apt/sources.list.d/google-chrome.list
-RUN apt-get update && apt-get install -y google-chrome-stable
+RUN sudo apt-get update && apt-get install -y wget gnupg
+RUN sudo wget -q -O - https://dl-ssl.google.com/linux/linux_signing_key.pub | apt-key add -
+RUN sudo echo "deb [arch=amd64] http://dl.google.com/linux/chrome/deb/ stable main" >> /etc/apt/sources.list.d/google-chrome.list
+RUN sudo apt-get update && apt-get install -y google-chrome-stable
 
 # Step 3: Download Chromedriver
 # Make sure to replace 'x.x.x.x' with the appropriate version of Chromedriver that matches your installed Chrome version.
-RUN wget -O /tmp/chromedriver.zip https://chromedriver.storage.googleapis.com/x.x.x.x/chromedriver_linux64.zip
+RUN sudo wget -O /tmp/chromedriver.zip https://chromedriver.storage.googleapis.com/x.x.x.x/chromedriver_linux64.zip
 
 # Step 4: Unzip and move Chromedriver to /usr/local/bin
-RUN apt-get install -y unzip
-RUN unzip /tmp/chromedriver.zip -d /usr/local/bin/
+RUN sudo apt-get install -y unzip
+RUN sudo unzip /tmp/chromedriver.zip -d /usr/local/bin/
 
 # Step 5: Set executable permissions for Chromedriver
-RUN chmod +x /usr/local/bin/chromedriver
+RUN sudo chmod +x /usr/local/bin/chromedriver
 
 # Step 6: Clean up
-RUN rm /tmp/chromedriver.zip
+RUN sudo rm /tmp/chromedriver.zip
 
 # Copy the current directory contents into the container at /app
 COPY src/ ./
