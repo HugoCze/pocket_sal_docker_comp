@@ -16,10 +16,10 @@ RUN sudo apt-get update && \
     sudo rm -rf /var/lib/apt/lists/*
 
 # Download and install ChromeDriver
-RUN CHROMEDRIVER_VERSION=2.41 && \
+RUN sudo CHROMEDRIVER_VERSION=2.41 && \
     sudo curl -O -L https://chromedriver.storage.googleapis.com/$(curl -s https://chromedriver.storage.googleapis.com/LATEST_RELEASE)/chromedriver_linux64.zip && \
-    unzip chromedriver_linux64.zip && \
-    chmod +x chromedriver && \
+    sudo unzip chromedriver_linux64.zip && \
+    sudo chmod +x chromedriver && \
     sudo mv chromedriver /usr/bin/chromedriver
 
 # Copy the current directory contents into the container at /app
