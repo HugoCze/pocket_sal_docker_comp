@@ -1,0 +1,3 @@
+docker build -t pocket_sal_image:tag .
+
+docker-compose up -d --scale web=10
