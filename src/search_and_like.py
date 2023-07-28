@@ -70,7 +70,7 @@ class Search_And_Like:
         driver.execute_script("arguments[0].click();", button_location)
         print(f"click - clicking given xpath: {xpath} - {call_indication}")
 
-    def search_comment(self, path, comment):
+    def search_comment(self, path, comment, like_dislikle):
         time.sleep(3)
         print(f"search_comment - searching for comment - CURRENT PAGE IS: {self.CURRENT_PAGE}",)
         for i in range(0, 34):
@@ -83,9 +83,13 @@ class Search_And_Like:
                     time.sleep(10)
                     like_button = possible_comment_xp[:-6]
                     like_button_xp = like_button + "div[1]/div[2]/div/button[1]"
+                    dis_like_button_xp = like_button + "div[1]/div[2]/div/button[2]"
                     print("got the like butt xpath")
                     time.sleep(3)
-                    self.click(like_button_xp, "search_comment - called click like button from comment searching")
+                    if like_dislikle == "like":
+                        self.click(like_button_xp, "search_comment - called click like button from comment searching")
+                    elif like_dislikle == "dislike":
+                        self.click(like_button_xp, "search_comment - called click dislike button from comment searching")
                     self.CURRENT_PAGE = 1
                     self.COMMENT_BUCKET = []
                     return
@@ -93,9 +97,9 @@ class Search_And_Like:
                 pass
         else:
             print("CALLING SEARCH NEXT FROM SEARCH COMMENT")
-            self.search_next(path, comment)
+            self.search_next(path, comment, like_dislikle)
     
-    def search_next(self, path, comment):
+    def search_next(self, path, comment, like_dislikle):
         print("search_next - searching the next button")
         for i in range(1, 42):
             for j in range(2,4):
@@ -107,7 +111,7 @@ class Search_And_Like:
                         print("search_next - got the next button")
                         self.click(next_button_xp, "search_next - clicked the next button")
                         self.CURRENT_PAGE += 1
-                        self.search_comment(path, comment)
+                        self.search_comment(path, comment, like_dislikle)
                         return
                 except ignored_exceptions:
                     pass

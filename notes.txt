@@ -1,3 +1,7 @@
 docker build -t pocket_sal_image:tag .
 
 docker-compose up -d --scale web=10
+
+
+
+python3 search_and_like.py --article "https://www.pudelek.pl/kinga-rusin-komentuje-tragiczny-pozar-na-rodos-ewakuowano-wszystkich-mieszkancow-miejscowosci-sasiadujacej-z-nasza-wioska-6923733386107872a?fbclid=IwAR0eb8JgpF4vPFCyvRNT_5kqnhePmDNu1EHBWo_l0fd7fyQR_TFwZNDklJc"  --comment "A ja uważam, ze Kinga takimi postami się zwyczajnie promuje. To jest ludzka tragedia, a dla pani pretekst żeby wrzucić swoje zdjęcie. Taki jest zreszta cały instagram. Niewazne jak poważny post, każdy obudowany jest selfikiem. Inna sprawa, że nagle każdy celebryta mieszka w Grecji, zna każda uliczkę i robi zakupy w lokalnych sklepach. Grecja jest popularnym kierunkiem, nie tylko wy tam jeździcie, drodzy celebryci ;)" --like_dislike "dislike"
