@@ -15,12 +15,26 @@ RUN sudo apt-get update && \
     sudo apt-get install -y --no-install-recommends git curl && \
     sudo rm -rf /var/lib/apt/lists/*
 
-# Download and install ChromeDriver
-RUN sudo CHROMEDRIVER_VERSION=2.41 && \
-    sudo curl -O -L https://chromedriver.storage.googleapis.com/$(curl -s https://chromedriver.storage.googleapis.com/LATEST_RELEASE)/chromedriver_linux64.zip && \
-    sudo unzip chromedriver_linux64.zip && \
-    sudo chmod +x chromedriver && \
-    sudo mv chromedriver /usr/bin/chromedriver
+
+# Step 2: Install Chrome
+RUN apt-get update && apt-get install -y wget gnupg
+RUN wget -q -O - https://dl-ssl.google.com/linux/linux_signing_key.pub | apt-key add -
+RUN echo "deb [arch=amd64] http://dl.google.com/linux/chrome/deb/ stable main" >> /etc/apt/sources.list.d/google-chrome.list
+RUN apt-get update && apt-get install -y google-chrome-stable
+
+# Step 3: Download Chromedriver
+# Make sure to replace 'x.x.x.x' with the appropriate version of Chromedriver that matches your installed Chrome version.
+RUN wget -O /tmp/chromedriver.zip https://chromedriver.storage.googleapis.com/x.x.x.x/chromedriver_linux64.zip
+
+# Step 4: Unzip and move Chromedriver to /usr/local/bin
+RUN apt-get install -y unzip
+RUN unzip /tmp/chromedriver.zip -d /usr/local/bin/
+
+# Step 5: Set executable permissions for Chromedriver
+RUN chmod +x /usr/local/bin/chromedriver
+
+# Step 6: Clean up
+RUN rm /tmp/chromedriver.zip
 
 # Copy the current directory contents into the container at /app
 COPY src/ ./
@@ -28,7 +42,7 @@ COPY src/ ./
 # Install pip and any needed packages specified in requirements.txt
 RUN sudo apt-get update && \
     sudo apt-get install -y --no-install-recommends python3-pip && \
-    sudo pip3 install --no-cache-dir -r requirements.txt
+    sudo pip3 install selenium argparse
 
 RUN sudo pip3 install --upgrade selenium
 
