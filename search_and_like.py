@@ -15,31 +15,25 @@ from selenium.common.exceptions import NoSuchElementException, InvalidSessionIdE
 import logging
 from logging.handlers import RotatingFileHandler
 
-# Custom handler to limit the log file size to a specific number of rows
-class LimitedRowsRotatingFileHandler(RotatingFileHandler):
-    def __init__(self, filename, mode='a', max_rows=500, *args, **kwargs):
+# Custom filter to limit the log to a specific number of rows
+class MaxRowsFilter(logging.Filter):
+    def __init__(self, max_rows):
         self.max_rows = max_rows
-        super().__init__(filename, mode, *args, **kwargs)
+        self.rows_logged = 0
 
-    def doRollover(self):
-        super().doRollover()
-        if self.stream is not None:
-            self.stream.seek(0)
-            lines = self.stream.readlines()
-            if len(lines) > self.max_rows:
-                with open(self.baseFilename, 'w') as f:
-                    f.writelines(lines[-self.max_rows:])
+    def filter(self, record):
+        self.rows_logged += 1
+        return self.rows_logged <= self.max_rows
 
-# Create a logger with the custom handler
+# Create a logger and add the custom filter
 logger = logging.getLogger('app_logger')
 logger.setLevel(logging.INFO)
 formatter = logging.Formatter('%(asctime)s - %(levelname)s - %(message)s')
-handler = LimitedRowsRotatingFileHandler(filename='app.log', max_rows=500)
+handler = logging.FileHandler(filename='app.log')
 handler.setFormatter(formatter)
+filter = MaxRowsFilter(max_rows=50)
+handler.addFilter(filter)
 logger.addHandler(handler)
-
-# Example usage
-logger.info('This is an example log message.')
 
 date_time = datetime.datetime.now()
 
