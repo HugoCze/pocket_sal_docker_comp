@@ -16,6 +16,8 @@ date_time = datetime.datetime.now()
 chrome_options = webdriver.ChromeOptions()
 chrome_options.add_argument("--disable-features=DefaultPassthroughCommandDecoder")
 chrome_options.add_argument("--disable-web-security")
+chrome_options.add_argument("--no-sandbox")
+chrome_options.add_argument("--disable-dev-shm-usage")
 chrome_options.add_argument("--allow-running-insecure-content")
 chrome_options.add_argument("--ignore-ssl-errors=yes")
 chrome_options.add_argument("--ignore-certificate-errors")
@@ -23,7 +25,7 @@ chrome_options.add_argument("--allow-insecure-localhost")
 chrome_options.add_argument("----headless")
 # chrome_options.headless = True
 
-driver = webdriver.Chrome(options=chrome_options)
+driver = webdriver.Chrome("/usr/local/bin/chromedriver/chromedriver", options=chrome_options)
 
 driver.set_page_load_timeout(5)
 
@@ -70,8 +72,9 @@ class Search_And_Like:
         driver.execute_script("arguments[0].click();", button_location)
         print(f"click - clicking given xpath: {xpath} - {call_indication}")
 
-    def search_comment(self, path, comment, like_dislikle):
+    def search_comment(self, path, comment1, like_dislikle):
         time.sleep(3)
+        print(f"comment1: {comment1}")
         print(f"search_comment - searching for comment - CURRENT PAGE IS: {self.CURRENT_PAGE}",)
         for i in range(0, 34):
             try:
@@ -79,17 +82,16 @@ class Search_And_Like:
                 comment_location = driver.find_element(By.XPATH, possible_comment_xp)
                 comment_text = comment_location.get_attribute('innerHTML')
                 print(comment_text.encode("utf-8"))
-                if comment_text.strip() == comment.strip():
+                if comment_text.strip() == comment1.strip():
                     time.sleep(10)
                     like_button = possible_comment_xp[:-6]
                     like_button_xp = like_button + "div[1]/div[2]/div/button[1]"
                     dis_like_button_xp = like_button + "div[1]/div[2]/div/button[2]"
-                    print("got the like butt xpath")
                     time.sleep(3)
                     if like_dislikle == "like":
                         self.click(like_button_xp, "search_comment - called click like button from comment searching")
                     elif like_dislikle == "dislike":
-                        self.click(like_button_xp, "search_comment - called click dislike button from comment searching")
+                        self.click(dis_like_button_xp, "search_comment - called click dislike button from comment searching")
                     self.CURRENT_PAGE = 1
                     self.COMMENT_BUCKET = []
                     return
@@ -97,7 +99,7 @@ class Search_And_Like:
                 pass
         else:
             print("CALLING SEARCH NEXT FROM SEARCH COMMENT")
-            self.search_next(path, comment, like_dislikle)
+            self.search_next(path, comment1, like_dislikle)
     
     def search_next(self, path, comment, like_dislikle):
         print("search_next - searching the next button")
@@ -137,3 +139,6 @@ if __name__ == "__main__":
         total_time = end_time - start_time
         print(f"Time of looking the comment is equal to: {total_time} ")
         print(f"Counter: {SAL.PROCCESS_COUNTER} ")
+
+
+# docker build -t pocket_sal_image:latest .    
