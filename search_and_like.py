@@ -14,26 +14,39 @@ from selenium.webdriver.support import expected_conditions as EC
 from selenium.common.exceptions import NoSuchElementException, InvalidSessionIdException, ElementNotInteractableException, StaleElementReferenceException, TimeoutException,ElementClickInterceptedException
 import logging
 from logging.handlers import RotatingFileHandler
+from logging.handlers import TimedRotatingFileHandler
 
-# Custom filter to limit the log to a specific number of rows
-class MaxRowsFilter(logging.Filter):
-    def __init__(self, max_rows):
+
+class MaxRowsFileHandler(logging.FileHandler):
+    def __init__(self, filename, mode='a', max_rows=50, encoding=None, delay=0):
+        super().__init__(filename, mode, encoding, delay)
         self.max_rows = max_rows
         self.rows_logged = 0
 
-    def filter(self, record):
-        self.rows_logged += 1
-        return self.rows_logged <= self.max_rows
+    def emit(self, record):
+        # Check if the number of logged rows exceeds the limit
+        if self.rows_logged >= self.max_rows:
+            # If it exceeds, truncate the file and reset the row count
+            self.stream.truncate(0)
+            self.rows_logged = 0
 
-# Create a logger and add the custom filter
+        # Call the parent's emit method to log the record
+        super().emit(record)
+        self.rows_logged += 1
+
+# Create a logger and add the custom handler
 logger = logging.getLogger('app_logger')
 logger.setLevel(logging.INFO)
 formatter = logging.Formatter('%(asctime)s - %(levelname)s - %(message)s')
-handler = logging.FileHandler(filename='app.log')
+
+# Use MaxRowsFileHandler instead of FileHandler
+handler = MaxRowsFileHandler(filename='app.log', max_rows=50)
 handler.setFormatter(formatter)
-filter = MaxRowsFilter(max_rows=50)
-handler.addFilter(filter)
 logger.addHandler(handler)
+
+# Now, the log file will be rotated at midnight, and the same log file will be overwritten each day when the limit is reached.
+
+
 
 date_time = datetime.datetime.now()
 
