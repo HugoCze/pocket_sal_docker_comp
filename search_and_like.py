@@ -12,9 +12,33 @@ from selenium.webdriver.support.ui import WebDriverWait, Select
 from selenium.webdriver.common.action_chains import ActionChains
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.common.exceptions import NoSuchElementException, InvalidSessionIdException, ElementNotInteractableException, StaleElementReferenceException, TimeoutException,ElementClickInterceptedException
+from logging.handlers import RotatingFileHandler
+
+# Custom handler to limit the log file size to a specific number of rows
+class LimitedRowsRotatingFileHandler(RotatingFileHandler):
+    def __init__(self, filename, mode='a', max_rows=500, *args, **kwargs):
+        self.max_rows = max_rows
+        super().__init__(filename, mode, *args, **kwargs)
+
+    def doRollover(self):
+        super().doRollover()
+        if self.stream is not None:
+            self.stream.seek(0)
+            lines = self.stream.readlines()
+            if len(lines) > self.max_rows:
+                with open(self.baseFilename, 'w') as f:
+                    f.writelines(lines[-self.max_rows:])
+
+# Create a logger with the custom handler
+logger = logging.getLogger('app_logger')
+logger.setLevel(logging.INFO)
+formatter = logging.Formatter('%(asctime)s - %(levelname)s - %(message)s')
+handler = LimitedRowsRotatingFileHandler(filename='app.log', max_rows=500)
+handler.setFormatter(formatter)
+logger.addHandler(handler)
+
 
 date_time = datetime.datetime.now()
-logging.basicConfig(filename='app.log', level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
 
 chrome_options = webdriver.ChromeOptions()
 chrome_options.add_argument("--disable-features=DefaultPassthroughCommandDecoder")
@@ -55,37 +79,37 @@ class Search_And_Like:
         homepage = "https://www.pudelek.pl/" + path
         try:
             driver.get(homepage)
-            logging.info(f"got home page: {homepage}")
+            logger(f"got home page: {homepage}")
             self.terms(path, comment, like_dislikle)
             time.sleep(5)
         except ignored_exceptions:
-            logging.info(f"Search_And_Like - failed to get homePage - refresh and terms")
+            logger(f"Search_And_Like - failed to get homePage - refresh and terms")
             self.terms(path, comment, like_dislikle)
     
     def terms(self, path, comment, like_dislikle):
-        logging.info("Terms and conditions starting...")
+        logger("Terms and conditions starting...")
         try:
             self.click("/html/body/div[3]/div/div[2]/div[3]/div/button[2]", "clicked accept terms button")
             self.search_comment(path, comment, like_dislikle)
         except ignored_exceptions:
-            logging.info(f"terms - Terms and conditions not found - searching comment")
+            logger(f"terms - Terms and conditions not found - searching comment")
             self.search_comment(path, comment, like_dislikle)
     
     def click(self, xpath, call_indication):
         button_location = driver.find_element(By.XPATH, xpath)
         driver.execute_script("arguments[0].click();", button_location)
-        logging.info(f"click - clicking given xpath: {xpath} - {call_indication}")
+        logger(f"click - clicking given xpath: {xpath} - {call_indication}")
 
     def search_comment(self, path, comment1, like_dislikle):
         time.sleep(3)
-        logging.info(f"comment1: {comment1}")
-        logging.info(f"search_comment - searching for comment - CURRENT PAGE IS: {self.CURRENT_PAGE}",)
+        logger(f"comment1: {comment1}")
+        logger(f"search_comment - searching for comment - CURRENT PAGE IS: {self.CURRENT_PAGE}",)
         for i in range(0, 34):
             try:
                 possible_comment_xp = f'//*[@id="page_content"]/div[1]/div/div[3]/div/div/div/div/div[{i}]/div/div[2]'
                 comment_location = driver.find_element(By.XPATH, possible_comment_xp)
                 comment_text = comment_location.get_attribute('innerHTML')
-                logging.info(comment_text.encode("utf-8"))
+                logger(comment_text.encode("utf-8"))
                 if comment_text.strip() == comment1.strip():
                     time.sleep(10)
                     like_button = possible_comment_xp[:-6]
@@ -102,11 +126,11 @@ class Search_And_Like:
             except ignored_exceptions:
                 pass
         else:
-            logging.info("CALLING SEARCH NEXT FROM SEARCH COMMENT")
+            logger("CALLING SEARCH NEXT FROM SEARCH COMMENT")
             self.search_next(path, comment1, like_dislikle)
     
     def search_next(self, path, comment, like_dislikle):
-        logging.info("search_next - searching the next button")
+        logger("search_next - searching the next button")
         for i in range(1, 42):
             for j in range(2,4):
                 try:
@@ -114,7 +138,7 @@ class Search_And_Like:
                     button_action = driver.find_element(By.XPATH, next_button_xp)
                     button_possible_text = button_action.get_attribute('innerHTML')
                     if button_possible_text == "Następna strona":
-                        logging.info("search_next - got the next button")
+                        logger("search_next - got the next button")
                         self.click(next_button_xp, "search_next - clicked the next button")
                         self.CURRENT_PAGE += 1
                         self.search_comment(path, comment, like_dislikle)
@@ -123,7 +147,7 @@ class Search_And_Like:
                     pass
     
     def main(self, path, comment, like_dislikle):
-        logging.info(f" \n \n main - here we are at main. Calling get_homePage. Like/dislike == {like_dislikle}")
+        logger(f" \n \n main - here we are at main. Calling get_homePage. Like/dislike == {like_dislikle}")
         self.get_homePage(path, comment, like_dislikle)
 
 SAL = Search_And_Like()
@@ -141,8 +165,8 @@ if __name__ == "__main__":
         SAL.main(args.article, args.comment, args.like_dislike)
         end_time = time.time()
         total_time = end_time - start_time
-        logging.info(f"Time of looking the comment is equal to: {total_time} ")
-        logging.info(f"Counter: {SAL.PROCCESS_COUNTER} ")
+        logger(f"Time of looking the comment is equal to: {total_time} ")
+        logger(f"Counter: {SAL.PROCCESS_COUNTER} ")
 
 
 
