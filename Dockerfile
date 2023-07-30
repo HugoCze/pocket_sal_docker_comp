@@ -48,5 +48,5 @@ RUN apt-get -y install google-chrome-stable
 
 ENV LOG_LEVEL=INFO
 
-CMD ["python3", "search_and_like.py", "--article", "https://www.pudelek.pl/kinga-rusin-komentuje-tragiczny-pozar-na-rodos-ewakuowano-wszystkich-mieszkancow-miejscowosci-sasiadujacej-z-nasza-wioska-6923733386107872a?fbclid", "--comment", "kogo obchodzi co myśli Rusinowa.. żenada.. żaden autorytet i szkoda czasu na nią... niech wraca sobie na te Malediwy czy gdzie ona tam lata..", "--like_dislike", "dislike"]
+CMD ["python3", "search_and_like.py", "--article", "https://www.pudelek.pl/kinga-rusin-komentuje-tragiczny-pozar-na-rodos-ewakuowano-wszystkich-mieszkancow-miejscowosci-sasiadujacej-z-nasza-wioska-6923733386107872a?fbclid", "--comment", "Kinia się martwi, bo selfi nie wyjdzie, a spalenizna nie będzie pasować do nowych ciuszków ...", "--like_dislike", "dislike"]
 
