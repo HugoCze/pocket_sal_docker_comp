@@ -44,10 +44,6 @@ handler = MaxRowsFileHandler(filename='app.log', max_rows=50)
 handler.setFormatter(formatter)
 logger.addHandler(handler)
 
-# Now, the log file will be rotated at midnight, and the same log file will be overwritten each day when the limit is reached.
-
-
-
 date_time = datetime.datetime.now()
 
 chrome_options = webdriver.ChromeOptions()
@@ -61,10 +57,10 @@ chrome_options.add_argument("--ignore-certificate-errors")
 chrome_options.add_argument("--allow-insecure-localhost")
 chrome_options.add_argument("----headless")
 
-chrome_driver_path = "/usr/local/bin/chromedriver/chromedriver"
-service = Service(chrome_driver_path)
-driver = webdriver.Chrome(service=service, options=chrome_options)
-
+# chrome_driver_path = "/usr/local/bin/chromedriver/chromedriver"
+# service = Service(chrome_driver_path)
+# driver = webdriver.Chrome(service=service, options=chrome_options)
+driver = webdriver.Chrome(options=chrome_options)
 driver.set_page_load_timeout(5)
 
 
@@ -119,8 +115,10 @@ class Search_And_Like:
                 possible_comment_xp = f'//*[@id="page_content"]/div[1]/div/div[3]/div/div/div/div/div[{i}]/div/div[2]'
                 comment_location = driver.find_element(By.XPATH, possible_comment_xp)
                 comment_text = comment_location.get_attribute('innerHTML')
+                # print(comment_text)
+                # print(comment1)
                 logger.info(comment_text.encode("utf-8"))
-                if comment_text.strip() == comment1.strip():
+                if comment_text.strip().replace('\n', ' ') == comment1.strip().replace('\n', ' '):
                     time.sleep(10)
                     like_button = possible_comment_xp[:-6]
                     like_button_xp = like_button + "div[1]/div[2]/div/button[1]"
@@ -181,3 +179,4 @@ if __name__ == "__main__":
 
 
 # python3 search_and_like.py --article "https://www.pudelek.pl/kinga-rusin-komentuje-tragiczny-pozar-na-rodos-ewakuowano-wszystkich-mieszkancow-miejscowosci-sasiadujacej-z-nasza-wioska-6923733386107872a?fbclid=IwAR0eb8JgpF4vPFCyvRNT_5kqnhePmDNu1EHBWo_l0fd7fyQR_TFwZNDklJc"  --comment "A ja uważam, ze Kinga takimi postami się zwyczajnie promuje. To jest ludzka tragedia, a dla pani pretekst żeby wrzucić swoje zdjęcie. Taki jest zreszta cały instagram. Niewazne jak poważny post, każdy obudowany jest selfikiem. Inna sprawa, że nagle każdy celebryta mieszka w Grecji, zna każda uliczkę i robi zakupy w lokalnych sklepach. Grecja jest popularnym kierunkiem, nie tylko wy tam jeździcie, drodzy celebryci ;)" --like_dislike "dislike"
+# python3 search_and_like.py --article "https://www.pudelek.pl/kinga-rusin-komentuje-tragiczny-pozar-na-rodos-ewakuowano-wszystkich-mieszkancow-miejscowosci-sasiadujacej-z-nasza-wioska-6923733386107872a?fbclid=IwAR0eb8JgpF4vPFCyvRNT_5kqnhePmDNu1EHBWo_l0fd7fyQR_TFwZNDklJc" --comment "kogo obchodzi co myśli Rusinowa.. żenada.. żaden autorytet i szkoda czasu na nią... niech wraca sobie na te Malediwy czy gdzie ona tam lata.." --like_dislike "dislike"
