@@ -57,10 +57,12 @@ chrome_options.add_argument("--ignore-certificate-errors")
 chrome_options.add_argument("--allow-insecure-localhost")
 chrome_options.add_argument("----headless")
 
-# chrome_driver_path = "/usr/local/bin/chromedriver/chromedriver"
-# service = Service(chrome_driver_path)
-# driver = webdriver.Chrome(service=service, options=chrome_options)
-driver = webdriver.Chrome(options=chrome_options)
+# FOR EC2
+chrome_driver_path = "/usr/local/bin/chromedriver/chromedriver"
+service = Service(chrome_driver_path)
+driver = webdriver.Chrome(service=service, options=chrome_options)
+# ONLY FOR LOCAL TESTS
+# driver = webdriver.Chrome(options=chrome_options)
 driver.set_page_load_timeout(5)
 
 
